@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     app_name: str = "Portal de Catastro Municipal"
     operativo_database_url: str
     municipal_database_url: str
+    idec_erp_database_url: str | None = None
     jwt_secret: str
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 8

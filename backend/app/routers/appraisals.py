@@ -16,12 +16,14 @@ from app.schemas.appraisal import (
     CharacteristicGroupOut,
     ConstructionUnitIn,
     MediaTypeOut,
+    ObservationBatchOut,
     OwnerPutIn,
     PhotoTypeUpdateIn,
     PropertyDetailIn,
     UnitCharacteristicsSaveIn,
 )
 from app.services import appraisal_service as svc
+from app.services import erp_review_service
 from app.services import media_service as media_svc
 from app.services import docx_service, pdf_service
 from app.services import valuation_service as val_svc
@@ -94,6 +96,17 @@ def create_appraisal(payload: AppraisalCreateIn, db: Session = Depends(get_db), 
 @router.get("/appraisals/{appraisal_id}", response_model=AppraisalDetailOut)
 def get_appraisal(appraisal_id: UUID, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     return svc.get_appraisal(db, appraisal_id, user)
+
+
+@router.get("/appraisals/{appraisal_id}/observations", response_model=list[ObservationBatchOut])
+def get_appraisal_observations(
+    appraisal_id: UUID,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Observaciones que el revisor del ERP mandó sobre este avalúo (lectura desde idec_erp)."""
+    appraisal = svc.get_appraisal(db, appraisal_id, user)
+    return erp_review_service.list_observation_batches(appraisal.form_number)
 
 
 @router.put("/appraisals/{appraisal_id}/owner", response_model=AppraisalDetailOut)

@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -215,6 +215,13 @@ class PhotoOut(BaseModel):
     width_px: int | None = None
     height_px: int | None = None
     created_at: str
+
+
+class ObservationBatchOut(BaseModel):
+    id: UUID
+    observations: list[str]
+    reviewed_by: str
+    reviewed_at: datetime
 
 
 class AppraisalDetailOut(BaseModel):

@@ -80,6 +80,7 @@ type Photo = {
   height_px?: number | null;
 };
 type MediaType = { id: string; code: string; name: string; category: string };
+type ObservationBatch = { id: string; observations: string[]; reviewed_by: string; reviewed_at: string };
 type Appraisal = {
   id: string;
   form_number?: string | null;
@@ -240,6 +241,8 @@ export function AppraisalFormPage() {
   const [editForm, setEditForm] = useState(blockForm);
   const [printing, setPrinting] = useState(false);
   const [valuation, setValuation] = useState<Valuation | null>(null);
+  const [observations, setObservations] = useState<ObservationBatch[]>([]);
+  const [showObservations, setShowObservations] = useState(false);
 
   const apiBase = API_URL;
   const readOnly = !isNew && appraisal != null && appraisal.can_edit === false;
@@ -313,6 +316,9 @@ export function AppraisalFormPage() {
       .then((data) => {
         hydrate(data, { resetChars: true });
         void loadValuation(data.id);
+        api<ObservationBatch[]>(`/api/v1/appraisals/${data.id}/observations`, {}, true)
+          .then(setObservations)
+          .catch(() => setObservations([]));
       })
       .catch((err) => setError(err instanceof Error ? err.message : "Error al cargar"))
       .finally(() => setLoading(false));
@@ -950,6 +956,35 @@ export function AppraisalFormPage() {
           </Link>
         </div>
       </div>
+
+      {(appraisal?.status_code === "needs_correction" || observations.length > 0) && (
+        <div className="card" style={{ marginBottom: "1rem" }}>
+          <button
+            type="button"
+            className="btn btn-out"
+            onClick={() => setShowObservations((v) => !v)}
+          >
+            {showObservations ? "Ocultar observaciones" : `Ver observaciones (${observations.length})`}
+          </button>
+          {showObservations && (
+            <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+              {observations.length === 0 && <p className="muted">Sin observaciones registradas.</p>}
+              {observations.map((batch) => (
+                <div key={batch.id} className="hint">
+                  <p className="muted" style={{ marginBottom: ".5rem" }}>
+                    {batch.reviewed_by} · {new Date(batch.reviewed_at).toLocaleString("es-BO")}
+                  </p>
+                  <ol style={{ margin: 0, paddingLeft: "1.25rem" }}>
+                    {batch.observations.map((obs, i) => (
+                      <li key={i}>{obs}</li>
+                    ))}
+                  </ol>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="card" style={{ marginBottom: "1rem" }}>
         <div className="form-stepper">
