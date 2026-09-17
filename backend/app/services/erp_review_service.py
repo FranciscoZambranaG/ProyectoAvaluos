@@ -1,6 +1,10 @@
-"""Lectura de observaciones que el ERP (idec_erp.appraisal_review) manda sobre un avalúo.
+"""Lectura de observaciones que el ERP (idec_erp.avaluos.appraisal_observations) manda
+sobre un avalúo.
 
-Conexión de solo lectura: este backend nunca escribe en idec_erp.
+Conexión de solo lectura: este backend nunca escribe en idec_erp. Nombre de schema/tabla
+según la base real (ver esquema_avaluos.sql en el repo de idec) -- no coincide con
+`appraisal_review.observation_batches`, que era el diseño original antes de confirmar el
+esquema con el equipo de BD.
 """
 
 from __future__ import annotations
@@ -22,7 +26,7 @@ def list_observation_batches(form_number: str | None) -> list[ObservationBatchOu
             text(
                 """
                 SELECT id, observations, reviewed_by, reviewed_at
-                FROM appraisal_review.observation_batches
+                FROM avaluos.appraisal_observations
                 WHERE form_number = :fn
                 ORDER BY reviewed_at DESC
                 """

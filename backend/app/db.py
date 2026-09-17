@@ -32,7 +32,7 @@ def get_municipal_engine() -> Engine:
 
 @lru_cache
 def get_idec_erp_engine() -> Engine | None:
-    """Conexión a idec_erp (appraisal_review). None si no está configurada.
+    """Conexión a idec_erp (schema avaluos). None si no está configurada.
 
     Solo se usa para lectura (SELECT) en app.services.erp_review_service; esta app
     nunca escribe en idec_erp. No se fuerza read-only a nivel de conexión porque el
